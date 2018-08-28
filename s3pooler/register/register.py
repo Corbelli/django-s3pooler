@@ -1,6 +1,5 @@
 from s3pooler.register.pooler import Pooler
 from s3pooler.events.events_router import router
-from s3pooler.events.events import common
 from s3pooler.utils.event_json import get_path, get_code
 
 class EventsRegister(Pooler):
