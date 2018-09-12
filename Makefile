@@ -10,33 +10,37 @@ _local_env:
 shell: _local_env
 	docker-compose exec  django bash
 
-migrate: _local_env
-	docker-compose run --rm django python manage.py migrate --noinput
-
 mkmigrations: _local_env
 	docker-compose exec django python manage.py makemigrations
 
-start: migrate
+migrate: mkmigrations
+	docker-compose run --rm django python manage.py migrate --noinput
+
+start:
 	docker-compose up -d
 
-stopw:
-	docker-compose stop celeryworker
+stopws:
+	docker-compose stop visionsworker s3poolerworker
 
-startw:
-	docker-compose start celeryworker
+startws:
+	docker-compose start visionsworker s3poolerworker
 
-worker:
+raw-w:
 	clear
-	docker-compose logs -f --tail=1  celeryworker
+	docker-compose logs -f --tail=1  s3poolerworker
+
+visions-w:
+	clear
+	docker-compose logs -f --tail=1  visionsworker
 
 stop: _local_env
 	docker-compose down -v
 
 registered: _local_env
-	docker-compose  exec celeryworker celery inspect registered
+	docker-compose  exec s3poolerworker celery inspect registered
 
 restart-celery:
-	docker-compose restart celeryworker celerybeat
+	docker-compose restart visionsworker s3poolerworker celerybeat
 
 build:
 	docker-compose build --force-rm --no-cache --pull

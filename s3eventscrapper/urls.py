@@ -36,4 +36,5 @@ urlpatterns = [
     url(r'^{}(?P<path>.*)$'.format(
         urlparse(settings.STATIC_URL).path.lstrip('/')
     ), serve, {'document_root': settings.STATIC_ROOT}),
+    url(r'^s3pooler/', include('s3pooler.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
