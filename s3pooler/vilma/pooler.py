@@ -1,4 +1,3 @@
-from django.db import transaction
 
 EVENTS_TO_POOL = 1000
 

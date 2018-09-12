@@ -13,22 +13,20 @@ from s3pooler.utils.event_json import get_created_at, get_headers,\
 # guardar cada evento. Aconselha-se criar um função para as informacões
 # comuns a todos os eventos e uma para cada evento, exemplo :
 
-def common(event_json):
+def common(json_model):
     event = RawEvents()
-    headers = get_headers(event_json)
-    event.referal = headers.get('Referal', 'Undefined')
-    event.os = headers.get('OS', 'Undefined')
-    event.device = headers.get('Device-id', 'Undefined')
-    event.timestamp = get_created_at(event_json)
-    event.identifier = get_id(event_json)
+    event.referal = json_model.headers('Referal')
+    event.os = json_model.headers('OS')
+    event.device = json_model.headers('Device-id')
+    event.timestamp = json_model.timestamp
+    event.identifier = json_model.id()
     return event
 
-def login(event_json):
-    event = common(event_json)
-    response = get_response(event_json)
-    event.user_id = response.get('id', -1)
+def login(json_model):
+    event = common(json_model)
+    event.user_id = json_model.response('id', -1)
     event.name = get_username(event.user_id)
-    event.content = user_json(event_json)
+    event.content = user_json(json_model)
     return event
 
 def user_created(event_json):

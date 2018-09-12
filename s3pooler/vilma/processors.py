@@ -9,7 +9,7 @@ class EventsJSONProcessor:
 
     def __procces_model(self, json_model):
         model = None
-        event_dict = router.get(get_path(json_model))
+        event_dict = router.get(json_model.path())
         if event_dict.get('callback', None):
            model = event_dict['callback'](json_model)
            if model.event_type == '':
@@ -45,10 +45,10 @@ class PathsProcessor:
         self.__update_saved_paths_table()
 
     def __save_json_pathdict(self, json_model):
-        event_dict = router.get(get_path(json_model))
-        path = event_dict.get('pure_path', get_path(json_model))
-        self.paths[path] = {'request': get_request(json_model),
-                            'response': get_response(json_model)}
+        event_dict = router.get(json_model.path)
+        path = event_dict.get('pure_path', json_model.path)
+        self.paths[path] = {'request': json_model.request,
+                            'response': json_model.response}
 
     def __update_saved_paths_table(self):
         saved_events = EventPaths.objects.get_events()

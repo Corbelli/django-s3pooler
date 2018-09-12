@@ -1,3 +1,4 @@
+import json
 from django.db import models
 from django_mysql.models import  Model
 from django.contrib.postgres.fields import JSONField as PostgresJSONField
@@ -9,6 +10,29 @@ env = environ.Env()
 is_mysql = (env.str('DB_ENGINE', '').split('.')[-1] == 'mysql')
 
 class JsonEvents(models.Model):
+    def request(self, param=None, default='Undefined'):
+        try:
+            return json.loads(self.request['body']).get(param, default)\
+            if param else json.loads(self.request['body'])
+        except Exception as e:
+            return {'error': 'Could not get request body : {}'.format(str(e))}
+    def response(self, param=None, default='Undefined'):
+        try:
+            return json.loads(self.response['body'])['data'].get(param, default)\
+            if param else json.loads(self.response['body'])['data']
+        except Exception as e:
+            return {'error': 'Could not get request body : {}'.format(str(e))}
+    def id(self):
+        return event_json['request']['requestContext']['requestId']
+    def headers(self, param, default='Undefined'):
+        return self.request['headers'].get(param, default) if param \
+            else self.request['headers']
+    def path(self):
+        return self.request['path']
+    def get_code(self):
+        return self.response['statusCode']
+    def string_params(self):
+        return self.request['queryStringParameters']
     timestamp = models.DateTimeField()
     request = MySQLJSONField() \
         if is_mysql else PostgresJSONField()
@@ -43,20 +67,20 @@ class UsersEvents(Events):
     pk_id = models.AutoField(primary_key=True)
 
 class DatetimeManager(models.Manager):
-    def last_timestamp(self, function):
-        last_event = self.filter(function=function).first()
+    def last_timestamp(self, associated_table):
+        last_event = self.filter(associated_table=associated_table).first()
         return last_event.last_processed_timestamp if last_event else None
-    def clean_last_datetime(self, function):
-        self.filter(function=function).delete()
-    def set_last_datetime(self, function, datetime=None, cmd=None):
-        self.clean_last_datetime(function)
+    def clean_last_datetime(self, associated_table):
+        self.filter(associated_table=associated_table).delete()
+    def set_last_datetime(self, associated_table, datetime=None, cmd=None):
+        self.clean_last_datetime(associated_table)
         if cmd == 'reset':
             return
-        last_datetime = self.last_timestamp(function)
+        last_datetime = self.last_timestamp(associated_table)
         if (not last_datetime) or cmd or (not last_datetime.command):
             self.create(last_processed_timestamp=datetime,
                         command=cmd,
-                        function=function)
+                        associated_table=associated_table)
         elif last_datetime.command == 'set':
             last_datetime.command = None
             last_datetime.save()
@@ -66,7 +90,7 @@ class Datetimes(models.Model):
     objects = DatetimeManager()
     last_processed_timestamp = models.DateTimeField(null=True, blank=True)
     command = models.CharField(max_length=20, null=True)
-    function = models.CharField(max_length=20, null=True)
+    associated_table = models.CharField(max_length=20, null=True)
 
 class EventsPathManager(models.Manager):
     def get_events(self):
