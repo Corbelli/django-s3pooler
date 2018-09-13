@@ -19,7 +19,8 @@ class S3Scrapper:
 
     @transaction.atomic
     def __save_models_update_datetime(self, modelslist, last_modified):
-        Datetimes.objects.set_last_datetime('s3pooler', last_modified)
+        if last_modified != None:
+            Datetimes.objects.set_last_datetime('s3pooler', last_modified)
         return self.pooler.save_models(modelslist, JsonEvents)
 
     def __process_json(self, json):
