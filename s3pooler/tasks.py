@@ -7,11 +7,11 @@ from .visions import UsersVision
 from django.db import transaction
 
 
-@periodic_task(run_every=timedelta(seconds=10))
+@periodic_task(run_every=timedelta(seconds=15))
 def scrapp_s3():
     scrapper = S3Scrapper()
     timestamp_before = Datetimes.objects.last_timestamp('s3pooler')
-    nr_registered = scrapper.scrapp_save_update_datetime(timestamp_before, 20)
+    nr_registered = scrapper.scrapp_save_update_datetime(timestamp_before, 10)
     timestamp_after = Datetimes.objects.last_timestamp('s3pooler')
     message = '''Task Done : {} events scrapped,      timestamp
     before: {} , after : {}'''.format(nr_registered, timestamp_before, timestamp_after)
@@ -19,10 +19,11 @@ def scrapp_s3():
     update_visions.delay(timestamp_before, timestamp_after)
 
 
-@periodic_task(run_every=timedelta(seconds=5),
+@periodic_task(run_every=timedelta(seconds=10),
                queue='users',
                options={'queue': 'users'})
 def update_visions(timestamp_before=None, timestamp_after=None):
+    pass
     raw = RawVision()
     users = UsersVision()
     if timestamp_after==None:

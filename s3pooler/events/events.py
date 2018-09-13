@@ -5,10 +5,6 @@ from s3pooler.events.application_db import get_username
 from s3pooler.models import RawEvents
 # importa todas as funções para criação dos dicionários de JSONField
 from s3pooler.events.contents_json import *
-# importa funções de auxilio para ler o JSON de evento no S3
-from s3pooler.utils.event_json import get_created_at, get_headers,\
-    get_request, get_response, get_path, get_id, get_request_response,\
-    get_string_params
 # Seção responsável por criar as funções específicas que sabem
 # guardar cada evento. Aconselha-se criar um função para as informacões
 # comuns a todos os eventos e uma para cada evento, exemplo :
@@ -19,7 +15,7 @@ def common(json_model):
     event.os = json_model.headers('OS')
     event.device = json_model.headers('Device-id')
     event.timestamp = json_model.timestamp
-    event.identifier = json_model.id()
+    event.identifier = json_model.identifier
     return event
 
 def login(json_model):
@@ -29,83 +25,76 @@ def login(json_model):
     event.content = user_json(json_model)
     return event
 
-def user_created(event_json):
-    event = common(event_json)
-    response = get_response(event_json)
-    event.event_id = response.get('id', -1)
-    event.user_id = response.get('id', -1)
-    event.name = get_username(event.user_id)
-    event.content = user_json(event_json)
-    return event
+def user_created(json_model):
+     event = common(json_model)
+     event.event_id = json_model.response('id', -1)
+     event.user_id = json_model.response('id', -1)
+     event.name = get_username(event.user_id)
+     event.content = user_json(json_model)
+     return event
 
-def post_reaction(event_json):
-    event = common(event_json)
-    request = get_request(event_json)
-    if 'post_id' in request:
-        event.target_id = request['post_id']
+def post_reaction(json_model):
+    event = common(json_model)
+    if 'post_id' in json_model.request():
+        event.target_id = json_model.request('post_id', -1)
         event.event_type = 'Post_Reaction'
         event.target_type = 'Post'
-    if 'comment_id' in request:
-        event.target_id = request['comment_id']
+    if 'comment_id' in json_model.request():
+        event.target_id = json_model.request('comment_id', -1)
         event.event_type = 'Comment_Reaction'
         event.target_type = 'Comment'
-    event.user_id = request.get('user_id', -1)
+    event.user_id = json_model.request('user_id', -1)
     event.name = get_username(event.user_id)
-    event.content = reaction_json(event_json)
+    event.content = reaction_json(json_model)
     return event
 
-def comment_reaction(event_json):
-    event = common(event_json)
-    request = get_request(event_json)
+def comment_reaction(json_model):
+    event = common(json_model)
     event.target_type = 'Comment'
-    event.target_id = request.get('comment_id', -1)
-    event.user_id = request.get('user_id', -1)
+    event.target_id = json_model.request('comment_id', -1)
+    event.user_id = json_model.request('user_id', -1)
     event.name = get_username(event.user_id)
-    event.content = reaction_json(event_json)
+    event.content = reaction_json(json_model)
     return event
 
-def post_created(event_json):
-    event = common(event_json)
-    response = get_response(event_json)
-    event.event_id = response.get('id', -1)
-    event.user_id = response['user']['id']
+def post_created(json_model):
+    event = common(json_model)
+    event.event_id = json_model.response('id', -1)
+    event.user_id = json_model.response('user').get('id', -1)
     event.name = get_username(event.user_id)
-    event.content = post_json(event_json)
+    event.content = post_json(json_model)
     return event
 
-def comment_created(event_json):
-    event = common(event_json)
-    request, response = get_request_response(event_json)
-    event.user_id = request.get('user_id', -1)
+def comment_created(json_model):
+    event = common(json_model)
+    event.user_id = json_model.request('user_id', -1)
     event.name = get_username(event.user_id)
-    event.content = comment_json(event_json)
+    event.content = comment_json(json_model)
     event.target_type = 'Post'
-    event.target_id = request.get('post_id', -1)
+    event.target_id = json_model.request('post_id', -1)
     return event
 
-def feed_scrolled(event_json):
-    event = common(event_json)
-    event.user_id = get_string_params(event_json).get('user_id', -1)
+def feed_scrolled(json_model):
+    event = common(json_model)
+    event.user_id = json_model.string_params('user_id', -1)
     event.name = get_username(event.user_id)
-    event.content = common_json(event_json)
+    event.content = common_json(json_model)
     return event
 
-def accepted_follow(event_json):
-    event = common(event_json)
-    request = get_request(event_json)
-    event.user_id = request.get('user_id', -1)
+def accepted_follow(json_model):
+    event = common(json_model)
+    event.user_id = json_model.request('user_id', -1)
     event.name = get_username(event.user_id)
-    event.target_id = request.get('friend_id', -1)
+    event.target_id = json_model.request('friend_id', -1)
     event.target_type = 'User'
-    event.content = common_json(event_json)
+    event.content = common_json(json_model)
     return event
 
-def follow_request(event_json):
-    event = common(event_json)
-    request = get_request(event_json)
-    event.user_id = request.get('user_id', -1)
+def follow_request(json_model):
+    event = common(json_model)
+    event.user_id = json_model.request('user_id', -1)
     event.name = get_username(event.user_id)
-    event.target_id = request.get('following_id', -1)
+    event.target_id = json_model.request('following_id', -1)
     event.target_type = 'User'
-    event.content = common_json(event_json)
+    event.content = common_json(json_model)
     return event

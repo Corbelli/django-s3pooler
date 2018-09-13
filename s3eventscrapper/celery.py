@@ -19,9 +19,9 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
 # Route tasks to specific queues
-task_routes = {
-    's3pooler.tasks.users_events': {'queue': 'users'},
-}
+# task_routes = {
+#     's3pooler.tasks.users_events': {'queue': 'users'},
+# }
 
 @app.task(bind=True)
 def debug_task(self):

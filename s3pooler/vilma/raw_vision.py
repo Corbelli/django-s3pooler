@@ -28,7 +28,8 @@ class RawVision:
         return self.pooler.save_models(translated_modellist, RawEvents)
 
     def __get_max_timestamp(self, models):
-        return sorted(models, key=lambda model: model.timestamp)[-1].timestamp
+        return sorted(models, key=lambda model: model.timestamp)[-1].timestamp \
+            if len(models) != 0 else None
 
     def __filter_func(self, query_set):
         return query_set

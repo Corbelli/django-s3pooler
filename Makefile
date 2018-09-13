@@ -19,13 +19,13 @@ migrate: mkmigrations
 start:
 	docker-compose up -d
 
-stopws:
+stop-ws:
 	docker-compose stop visionsworker s3poolerworker
 
-startws:
+start-ws:
 	docker-compose start visionsworker s3poolerworker
 
-raw-w:
+s3-w:
 	clear
 	docker-compose logs -f --tail=1  s3poolerworker
 

@@ -1,5 +1,4 @@
 from s3pooler.events.events_router import router
-from s3pooler.utils.event_json import get_path, get_code, get_request, get_response
 from s3pooler.models import EventPaths, UsersEvents
 
 class EventsJSONProcessor:
@@ -40,15 +39,15 @@ class EventsProcessor:
 class PathsProcessor:
     paths = {}
 
-    def update_save_paths(self, s3_json_models):
-        [self.__save_json_pathdict(json_model) for json_model in s3_json_models]
+    def update_save_paths(self, models):
+        [self.__save_json_pathdict(json_model) for json_model in models]
         self.__update_saved_paths_table()
 
     def __save_json_pathdict(self, json_model):
-        event_dict = router.get(json_model.path)
-        path = event_dict.get('pure_path', json_model.path)
-        self.paths[path] = {'request': json_model.request,
-                            'response': json_model.response}
+        event_dict = router.get(json_model.path())
+        path = event_dict.get('pure_path', json_model.path())
+        self.paths[path] = {'request': json_model.request(),
+                            'response': json_model.response()}
 
     def __update_saved_paths_table(self):
         saved_events = EventPaths.objects.get_events()

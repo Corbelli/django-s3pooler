@@ -7,10 +7,13 @@ class Pooler():
     def __init__(self, table):
         self.table = table
 
-    def events_in_timestamp_interval(self, filter_func, min_timestamp=None, max_timestamp=None):
-        new_events =  self.__get_in_timestamp(min_timestamp, max_timestamp)
-        return list(filter_func(new_events).order_by('timestamp')) \
+    def events_in_timestamp_interval(self, filter_func,
+                min_timestamp=None, max_timestamp=None):
+        new_events = self.__get_in_timestamp(min_timestamp, max_timestamp)
+        filtered = filter_func(new_events).order_by('timestamp') \
             if new_events else []
+        return list(filtered) if max_timestamp==None \
+            else list(filtered[:EVENTS_TO_POOL])
 
     def save_models(self, models, table_to_save):
             sorted_models = sorted(models, key=lambda model: model.timestamp)
@@ -28,6 +31,6 @@ class Pooler():
             return self.table.objects.filter(timestamp__gte=min_timestamp) \
                 .filter(timestamp__lte=max_timestamp)
         elif min_timestamp:
-            return self.table.objects.filter(timestamp__gte=min_timestamp)[:EVENTS_TO_POOL]
+            return self.table.objects.filter(timestamp__gte=min_timestamp)
         else:
-            return self.table.objects.all()[:EVENTS_TO_POOL]
+            return self.table.objects.all()

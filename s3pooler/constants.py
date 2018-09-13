@@ -1,5 +1,3 @@
-EVENTS_TO_LOG = 1000
-
 BLACKLIST = [
     1,     #admin
     2,     #yummie
@@ -33,4 +31,5 @@ BLACKLIST = [
     24224, #João Paulo Braga
     18832, #Pedro de Lamare
     18835, #Paula Nabuco
+    24786, #Robson Durval
 ]

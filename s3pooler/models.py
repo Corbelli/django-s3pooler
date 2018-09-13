@@ -12,33 +12,41 @@ is_mysql = (env.str('DB_ENGINE', '').split('.')[-1] == 'mysql')
 class JsonEvents(models.Model):
     def request(self, param=None, default='Undefined'):
         try:
-            return json.loads(self.request['body']).get(param, default)\
-            if param else json.loads(self.request['body'])
-        except Exception as e:
-            return {'error': 'Could not get request body : {}'.format(str(e))}
+            return json.loads(self.request_dict['body']).get(param, default)\
+            if param else json.loads(self.request_dict['body'])
+        except Exception:
+            return {'error': 'Could not get request body : {}'.format(self.response_dict)}
+
     def response(self, param=None, default='Undefined'):
         try:
-            return json.loads(self.response['body'])['data'].get(param, default)\
-            if param else json.loads(self.response['body'])['data']
-        except Exception as e:
-            return {'error': 'Could not get request body : {}'.format(str(e))}
-    def id(self):
-        return event_json['request']['requestContext']['requestId']
+            return json.loads(self.response_dict['body']).get('data', {}).get(param, default)\
+            if param else json.loads(self.response_dict['body']).get('data', {})
+        except Exception:
+            return {'error': 'Could not get request body : {}'.format(self.response_dict)}
+
     def headers(self, param, default='Undefined'):
-        return self.request['headers'].get(param, default) if param \
-            else self.request['headers']
+        return self.request_dict['headers'].get(param, default) if param \
+            else self.request_dict['headers']
+
     def path(self):
-        return self.request['path']
-    def get_code(self):
-        return self.response['statusCode']
-    def string_params(self):
-        return self.request['queryStringParameters']
+        return self.request_dict['path']
+
+    def code(self):
+        return self.response_dict['statusCode']
+
+    def string_params(self, param, default='Undefined'):
+        return self.request_dict['queryStringParameters'].get(param, default) \
+            if param else self.request_dict['queryStringParameters']
+
     timestamp = models.DateTimeField()
-    request = MySQLJSONField() \
+    request_dict = MySQLJSONField() \
         if is_mysql else PostgresJSONField()
-    response = MySQLJSONField() \
+    response_dict = MySQLJSONField() \
         if is_mysql else PostgresJSONField()
     inserted_at = models.DateTimeField(auto_now_add=True)
+    identifier = models.CharField(max_length=100)
+    class Meta:
+            indexes = [models.Index(fields=['timestamp'])]
 
 class Events(Model if is_mysql else models.Model):
     timestamp = models.DateTimeField()
@@ -73,10 +81,10 @@ class DatetimeManager(models.Manager):
     def clean_last_datetime(self, associated_table):
         self.filter(associated_table=associated_table).delete()
     def set_last_datetime(self, associated_table, datetime=None, cmd=None):
+        last_datetime = self.filter(associated_table=associated_table).first()
         self.clean_last_datetime(associated_table)
         if cmd == 'reset':
             return
-        last_datetime = self.last_timestamp(associated_table)
         if (not last_datetime) or cmd or (not last_datetime.command):
             self.create(last_processed_timestamp=datetime,
                         command=cmd,

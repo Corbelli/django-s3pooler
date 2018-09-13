@@ -1,5 +1,5 @@
 from .models import RawEvents, UsersEvents
-from .constants import EVENTS_TO_LOG, BLACKLIST
+from .constants import BLACKLIST
 from .vilma.pooler import Pooler
 from .vilma.processors import EventsProcessor
 

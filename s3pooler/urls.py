@@ -3,6 +3,7 @@ from . import views
 
 
 urlpatterns = [
-    url('scrapp', views.set_scrapping_datetime),
+    url('settime/pooler', views.set_s3pooler_datetime),
+    url('settime/visions', views.set_visions_datetime),
     url('delete_paths', views.delete_paths),
 ]
