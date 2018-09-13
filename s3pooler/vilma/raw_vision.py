@@ -24,7 +24,8 @@ class RawVision:
         self.pahts_saver.update_save_paths(modellist)
         if max_timestamp==None:
             last_timestamp = self.__get_max_timestamp(translated_modellist)
-            Datetimes.objects.set_last_datetime('visions', last_timestamp)
+            if last_timestamp != None:
+                Datetimes.objects.set_last_datetime('visions', last_timestamp)
         return self.pooler.save_models(translated_modellist, RawEvents)
 
     def __get_max_timestamp(self, models):

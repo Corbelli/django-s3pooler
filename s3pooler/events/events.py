@@ -78,7 +78,7 @@ def feed_scrolled(json_model):
     event = common(json_model)
     event.user_id = json_model.string_params('user_id', -1)
     event.name = get_username(event.user_id)
-    event.content = common_json(json_model)
+    event.content = scroll_json(json_model)
     return event
 
 def accepted_follow(json_model):

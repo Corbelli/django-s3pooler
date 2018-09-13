@@ -12,7 +12,7 @@ class S3Scrapper:
 
     def scrapp_save_update_datetime(self, last_timestamp, nr_files):
         sorted_objs = self.s3.get_recent_objs(last_timestamp, nr_files)
-        last_modified = sorted_objs[-1].last_modified
+        last_modified = sorted_objs[-1].last_modified if sorted_objs else None
         jsonlist = self.s3.get_keylist_jsons([obj.key for obj in sorted_objs])
         models = [self.__process_json(json) for json in jsonlist]
         return self.__save_models_update_datetime(models, last_modified)
