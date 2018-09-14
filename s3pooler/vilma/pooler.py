@@ -29,5 +29,4 @@ class Pooler():
         elif min_timestamp:
             return self.table.objects.filter(timestamp__gte=min_timestamp)
         else:
-            print('Tentando')
             return self.table.objects.all()

@@ -2,8 +2,8 @@
 # Todas as funções devem receber um JSON do evento e retornar o JSON com
 # o conteúdo, exemplo :
 
-def _dict(func, keys_list):
-    return {key:func(key) for key in keys_list}
+def _dict(callback, keys_list):
+    return {key:callback(key) for key in keys_list}
 
 def common_json(json_model):
     return {'response_code': json_model.code()}
