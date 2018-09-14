@@ -1,6 +1,7 @@
 from .pooler import Pooler
 from s3pooler.models import JsonEvents, RawEvents, Datetimes
 from .processors import EventsJSONProcessor, PathsProcessor
+from django.db import transaction
 
 class RawVision:
     pooler = Pooler(JsonEvents)
@@ -19,6 +20,7 @@ class RawVision:
     def __translate_modellist(self, models_list):
         return self.translator.translate_modellist(models_list)
 
+    @transaction.atomic
     def __save_update_tables(self, modellist, translated_modellist, min_timestamp, max_timestamp):
         self.paths_saver.update_save_paths(modellist)
         last_timestamp = self.__get_max_timestamp(translated_modellist)

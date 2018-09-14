@@ -1,3 +1,5 @@
+from django.db import transaction
+
 EVENTS_TO_POOL = 1000
 
 class Pooler():
@@ -11,6 +13,7 @@ class Pooler():
         filtered = filter_func(self.__get_in_timestamp(min_timestamp, max_timestamp))
         return list(filtered[:EVENTS_TO_POOL])
 
+    @transaction.atomic
     def save_models(self, models, table_to_save):
             sorted_models = sorted(models, key=lambda model: model.timestamp)
             same_time_models = list(table_to_save.objects\
