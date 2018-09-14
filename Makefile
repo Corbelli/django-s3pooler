@@ -22,6 +22,9 @@ start:
 start-prod:
 	docker-compose -f docker-compose.prod.yml up -d
 
+stop-prod: _local_env
+	docker-compose -f docker-compose.prod.yml down -v
+
 stop-ws:
 	docker-compose stop visionsworker s3poolerworker
 
