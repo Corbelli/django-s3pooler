@@ -1,0 +1,94 @@
+version: '3.3'
+services:
+
+  django:
+    image: s3eventscrapper_django:dev
+    build:
+      context: .
+      args:
+        release: dev
+    volumes:
+      - ./:/usr/src/app
+      - django-media:/usr/src/app/media
+      - django-static:/usr/src/app/static
+    env_file:
+      - develop.env
+      - local.env
+    environment:
+      - COMMAND=runserver
+    ports:
+      - 8000:8000
+    depends_on:
+      - redis
+
+  s3poolerworker:
+    image: s3eventscrapper_django:dev
+    volumes:
+      - ./:/usr/src/app
+      - django-media:/usr/src/app/media
+      - django-static:/usr/src/app/static
+    env_file:
+      - develop.env
+      - local.env
+    environment:
+      - COMMAND=s3poolerworker
+    depends_on:
+      - django
+
+  visionsworker:
+    image: s3eventscrapper_django:dev
+    volumes:
+      - ./:/usr/src/app
+      - django-media:/usr/src/app/media
+      - django-static:/usr/src/app/static
+    env_file:
+      - develop.env
+      - local.env
+    environment:
+      - COMMAND=visionsworker
+    depends_on:
+      - django
+
+  celerybeat:
+    image: s3eventscrapper_django:dev
+    volumes:
+      - ./:/usr/src/app
+      - django-media:/usr/src/app/media
+      - django-static:/usr/src/app/static
+    env_file:
+      - develop.env
+      - local.env
+    environment:
+      - COMMAND=celerybeat
+    depends_on:
+      - django
+
+  celeryflower:
+    image: s3eventscrapper_django:dev
+    volumes:
+      - ./:/usr/src/app
+      - django-media:/usr/src/app/media
+      - django-static:/usr/src/app/static
+    env_file:
+      - develop.env
+      - local.env
+    environment:
+      - COMMAND=celeryflower
+    ports:
+      - 5555:5555
+    depends_on:
+      - django
+
+  redis:
+    image: redis:3.2.10
+    volumes:
+      - redis-data:/data
+
+volumes:
+  django-media:
+  django-static:
+  redis-data:
+
+networks:
+  default:
+    driver: bridge

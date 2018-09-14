@@ -19,6 +19,9 @@ migrate: mkmigrations
 start:
 	docker-compose up -d
 
+start-prod:
+	docker-compose -f docker-compose.prod.yml up -d
+
 stop-ws:
 	docker-compose stop visionsworker s3poolerworker
 
