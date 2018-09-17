@@ -64,19 +64,19 @@ INSTALLED_APPS = [
 DATABASES = {
     'default':{
         'NAME': env.str('EV_DB_NAME', ''),
-        'ENGINE': env.str('DB_ENGINE', ''),
+        'ENGINE': env.str('EV_DB_ENGINE', ''),
         'USER': env.str('EV_DB_USER', ''),
         'PASSWORD': env.str('EV_DB_PASSWORD', ''),
-        'HOST': env.str('DB_HOST', ''),
-        'PORT': env.str('DB_PORT', '')
+        'HOST': env.str('EV_DB_HOST', ''),
+        'PORT': env.str('EV_DB_PORT', '')
     },
     'app_db' : {
         'NAME': env.str('APP_DB_NAME', ''),
-        'ENGINE': env.str('DB_ENGINE', ''),
+        'ENGINE': env.str('APP_DB_ENGINE', ''),
         'USER': env.str('APP_DB_USER', ''),
         'PASSWORD': env.str('APP_DB_PASSWORD', ''),
-        'HOST': env.str('DB_HOST', ''),
-        'PORT': env.str('DB_PORT', '')
+        'HOST': env.str('APP_DB_HOST', ''),
+        'PORT': env.str('APP_DB_PORT', '')
     }
 }
 

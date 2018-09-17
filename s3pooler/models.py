@@ -7,7 +7,7 @@ import environ
 env = environ.Env()
 
 ### Específico para MySQL ###
-is_mysql = (env.str('DB_ENGINE', '').split('.')[-1] == 'mysql')
+is_mysql = (env.str('EV_DB_ENGINE', '').split('.')[-1] == 'mysql')
 
 class JsonEvents(models.Model):
     def request(self, param=None, default='Undefined'):
