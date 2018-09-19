@@ -5,8 +5,7 @@ from datetime import timedelta
 from .models import Datetimes
 from .visions import UsersVision
 from django.db import transaction
-from celery import Celery
-app = Celery()
+from celery import shared_task
 
 
 @periodic_task(run_every=timedelta(seconds=20))
@@ -35,7 +34,7 @@ def update_raw(timestamp_before=None, timestamp_after=None):
     transaction.on_commit(lambda: update_users.delay(timestamp_before, timestamp_after))
     return raw_saved
 
-@app.task(queue='users')
+@shared_task(queue='users')
 def update_users(timestamp_before=None, timestamp_after=None):
     users = UsersVision()
     users_saved = users.pool_save(timestamp_before, timestamp_after)
