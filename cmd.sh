@@ -8,7 +8,7 @@ if [[ $COMMAND = "s3poolerworker" ]]; then
 
 elif [[ $COMMAND = "visionsworker" ]]; then
     echo "Running Celery Worker"
-    exec celery worker -E -A s3eventscrapper --concurrency 1  -Q users
+    exec celery worker -E -A s3eventscrapper --concurrency 1 -Q celery
 
 elif [[ $COMMAND = "celerybeat" ]]; then
     echo "Running Celery Beat"
