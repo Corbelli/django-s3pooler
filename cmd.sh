@@ -4,7 +4,7 @@ set -e
 
 if [[ $COMMAND = "s3poolerworker" ]]; then
     echo "Running Celery Worker"
-    exec celery worker -E -A s3eventscrapper --concurrency 1 -Q celery, users
+    exec celery worker -E -A s3eventscrapper --concurrency 1 # -Q celery, users
 
 elif [[ $COMMAND = "visionsworker" ]]; then
     echo "Running Celery Worker"

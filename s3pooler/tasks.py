@@ -20,9 +20,9 @@ def scrapp_s3(files_to_scrap=5):
     transaction.on_commit(lambda: update_raw.delay(timestamp_before, timestamp_after))
     return nr_registered
 
-@periodic_task(run_every=timedelta(seconds=10),
-               queue='users',
-               options={'queue': 'users'})
+@periodic_task(run_every=timedelta(seconds=10))#,
+               #queue='users',
+               #options={'queue': 'users'})
 def update_raw(timestamp_before=None, timestamp_after=None):
     raw = RawVision()
     if timestamp_after==None:
@@ -34,7 +34,7 @@ def update_raw(timestamp_before=None, timestamp_after=None):
     transaction.on_commit(lambda: update_users.delay(timestamp_before, timestamp_after))
     return raw_saved
 
-@shared_task(queue='users')
+@shared_task()#queue='users')
 def update_users(timestamp_before=None, timestamp_after=None):
     users = UsersVision()
     users_saved = users.pool_save(timestamp_before, timestamp_after)
