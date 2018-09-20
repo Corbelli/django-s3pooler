@@ -125,3 +125,11 @@ class EventPaths(models.Model):
         if is_mysql else PostgresJSONField(null=True)
     response = MySQLJSONField(null=True) \
         if is_mysql else PostgresJSONField(null=True)
+
+class Users(models.Model):
+    username = models.CharField(max_length=50)
+    created_at = models.DateTimeField()
+    email = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    facebook_id = models.CharField(max_length=100)
+    instagram_id = models.CharField(max_length=100)

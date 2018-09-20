@@ -1,12 +1,14 @@
 import pytz
 import json
+import time
 import boto3
 import environ
 from io import BytesIO
 from gzip import GzipFile
 from functools import reduce
-from datetime import datetime
+from datetime import datetime, timedelta
 env = environ.Env()
+MAX_OBJS_TO_GET = 1000
 
 class S3Manager():
     bucket_name = env.str('AWS_S3_BUCKET_NAME')
@@ -20,15 +22,32 @@ class S3Manager():
                 aws_secret_access_key=env.str('AWS_SECRET_ACCESS_KEY'),
                 ).resource('s3').Bucket(bucket_name)
 
+    def __get_search_dates(self, date):
+        if date is None:
+            return None
+        hour = '{}/{:02d}/{:02d}/{:02d}/'.format(date.year, date.month, date.day, date.hour)
+        next_hour = '{}/{:02d}/{:02d}/{:02d}/'.format(date.year, date.month, date.day, date.hour + 1)
+        day = '{}/{:02d}/{:02d}/'.format(date.year, date.month, date.day)
+        next_day = '{}/{:02d}/{:02d}/'.format(date.year, date.month, date.day + 1)
+        return {'hour':hour, 'next_hour':next_hour, 'day':day, 'next_day':next_day}
+
+    def __get_recent_in_search(self, last_timestamp, search):
+        objs = self.bucket.objects.limit(MAX_OBJS_TO_GET) if search == None \
+        else self.bucket.objects.filter(Prefix=search).limit(MAX_OBJS_TO_GET)
+        return list(objs) if (last_timestamp is None) else \
+        [_file for _file in objs if _file.last_modified  >= last_timestamp]
+
     def get_recent_objs(self, last_timestamp, n_files_to_process):
         ''' Pega os n_files_to_procces arquivos mais antigos entre todos
         os arquivos no bucket com eventos mais recentes que last_timestamp'''
-        objs = list(self.bucket.objects.all())
-        if (last_timestamp is None):
-            recent_objs =  objs
-        else:
-            recent_objs = [_file for _file in objs \
-                    if (self.__get_key_first_event_time(_file.key)  >= last_timestamp) ]
+        search = self.__get_search_dates(last_timestamp)
+        recent_objs = self.__get_recent_in_search(last_timestamp, search.get('hour'))
+        if (len(recent_objs) == 0) and (datetime.utcnow().hour > last_timestamp.hour):
+            recent_objs = self.__get_recent_in_search(last_timestamp, search.get('next_hour'))
+            if (len(recent_objs) == 0):
+                recent_objs = self.__get_recent_in_search(last_timestamp, search.get('day'))
+                if (len(recent_objs) == 0):
+                    recent_objs = self.__get_recent_in_search(last_timestamp, search.get('next_day'))
         return self.__get_first_n_recent_objects(recent_objs, n_files_to_process)
 
     def get_keylist_jsons(self, keys):
@@ -57,9 +76,5 @@ class S3Manager():
         jsons = [json.loads(string) for string in events_str_list]
         return jsons
 
-    def __get_key_first_event_time(self, key):
-        key_without_name = key.replace(self.firehose_name + '-', '')
-        date_string = key_without_name.split('-')[1:7]
-        date = datetime(year=int(date_string[0]), month=int(date_string[1]), day=int(date_string[2]),\
-               hour=int(date_string[3]), minute=int(date_string[4]), second=int(date_string[5]), tzinfo=pytz.UTC)
-        return date
+def now_uc(datetime):
+    return datetime.now().replace(tzinfo=pytz.utc) - datetime

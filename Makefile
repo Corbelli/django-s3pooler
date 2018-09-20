@@ -35,6 +35,9 @@ worker:
 	clear
 	docker-compose logs -f --tail=1  worker
 
+beat:
+	docker-compose logs celerybeat
+
 stop: _local_env
 	docker-compose down -v
 

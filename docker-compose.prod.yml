@@ -31,7 +31,7 @@ services:
       - develop.env
       - local.env
     environment:
-      - COMMAND=s3poolerworker
+      - COMMAND=worker
     depends_on:
       - django
 
