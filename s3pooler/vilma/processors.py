@@ -23,6 +23,7 @@ class EventsProcessor:
     def __procces_model(self, model, table):
         return table(
             timestamp=model.timestamp,
+            user_created_at=model.user_created_at,
             name=model.name,
             event_type=model.event_type,
             event_id=model.event_id,
