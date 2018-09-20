@@ -35,7 +35,7 @@ class S3Manager():
         objs = self.bucket.objects.limit(MAX_OBJS_TO_GET) if search == None \
         else self.bucket.objects.filter(Prefix=search).limit(MAX_OBJS_TO_GET)
         return list(objs) if (last_timestamp is None) else \
-        [_file for _file in objs if _file.last_modified  >= last_timestamp]
+        [_file for _file in objs if _file.last_modified  > last_timestamp]
 
     def get_recent_objs(self, last_timestamp, n_files_to_process):
         ''' Pega os n_files_to_procces arquivos mais antigos entre todos

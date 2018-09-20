@@ -25,11 +25,11 @@ start-prod:
 stop-prod: _local_env
 	docker-compose -f docker-compose.prod.yml down -v
 
-stop-w:
-	docker-compose stop worker
+stop-c:
+	docker-compose stop worker celerybeat
 
-start-w:
-	docker-compose start worker
+start-c:
+	docker-compose start worker celerybeat
 
 worker:
 	clear
