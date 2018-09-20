@@ -21,7 +21,7 @@ services:
     depends_on:
       - redis
 
-  s3poolerworker:
+  worker:
     image: s3eventscrapper_django:dev
     volumes:
       - ./:/usr/src/app
@@ -32,20 +32,6 @@ services:
       - local.env
     environment:
       - COMMAND=s3poolerworker
-    depends_on:
-      - django
-
-  visionsworker:
-    image: s3eventscrapper_django:dev
-    volumes:
-      - ./:/usr/src/app
-      - django-media:/usr/src/app/media
-      - django-static:/usr/src/app/static
-    env_file:
-      - develop.env
-      - local.env
-    environment:
-      - COMMAND=visionsworker
     depends_on:
       - django
 

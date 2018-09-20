@@ -25,28 +25,24 @@ start-prod:
 stop-prod: _local_env
 	docker-compose -f docker-compose.prod.yml down -v
 
-stop-ws:
-	docker-compose stop visionsworker s3poolerworker
+stop-w:
+	docker-compose stop worker
 
-start-ws:
-	docker-compose start visionsworker s3poolerworker
+start-w:
+	docker-compose start worker
 
-s3-w:
+worker:
 	clear
-	docker-compose logs -f --tail=1  s3poolerworker
-
-visions-w:
-	clear
-	docker-compose logs -f --tail=1  visionsworker
+	docker-compose logs -f --tail=1  worker
 
 stop: _local_env
 	docker-compose down -v
 
 registered: _local_env
-	docker-compose  exec s3poolerworker celery inspect registered
+	docker-compose  exec worker celery inspect registered
 
 restart-celery:
-	docker-compose restart visionsworker s3poolerworker celerybeat
+	docker-compose restart worker celerybeat
 
 build:
 	docker-compose build --force-rm --no-cache --pull

@@ -54,6 +54,7 @@ class Events(Model if is_mysql else models.Model):
     event_type = models.CharField(max_length=25)
     event_id = models.BigIntegerField(null=True)
     user_id = models.BigIntegerField()
+    user_created_at = models.DateTimeField(null=True)
     content = MySQLJSONField(null=True) \
         if is_mysql else PostgresJSONField(null=True)
     target_type = models.CharField(max_length=20, null=True)

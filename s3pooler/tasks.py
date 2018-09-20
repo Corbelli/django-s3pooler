@@ -8,8 +8,8 @@ from django.db import transaction
 from celery import shared_task
 
 
-@periodic_task(run_every=timedelta(seconds=20))
-def scrapp_s3(files_to_scrap=5):
+@periodic_task(run_every=timedelta(seconds=15))
+def scrapp_s3(files_to_scrap=3):
     scrapper = S3Scrapper()
     timestamp_before = Datetimes.objects.last_timestamp('s3pooler')
     nr_registered = scrapper.scrapp_save_update_datetime(timestamp_before, files_to_scrap)
@@ -20,13 +20,11 @@ def scrapp_s3(files_to_scrap=5):
     transaction.on_commit(lambda: update_raw.delay(timestamp_before, timestamp_after))
     return nr_registered
 
-@periodic_task(run_every=timedelta(seconds=10))#,
-               #queue='users',
-               #options={'queue': 'users'})
+@periodic_task(run_every=timedelta(seconds=10))
 def update_raw(timestamp_before=None, timestamp_after=None):
     raw = RawVision()
     if timestamp_after==None:
-        timestamp_before = Datetimes.objects.last_timestamp('raw_vision')
+        timestamp_before = Datetimes.objects.last_timestamp('visions')
     raw_saved = raw.pool_save_update_tables(timestamp_before, timestamp_after)
     message = '''Raw Updated, {} timestamp before: {} , after : {}'''.\
         format(raw_saved, timestamp_before, timestamp_after)
@@ -34,7 +32,7 @@ def update_raw(timestamp_before=None, timestamp_after=None):
     transaction.on_commit(lambda: update_users.delay(timestamp_before, timestamp_after))
     return raw_saved
 
-@shared_task()#queue='users')
+@shared_task()
 def update_users(timestamp_before=None, timestamp_after=None):
     users = UsersVision()
     users_saved = users.pool_save(timestamp_before, timestamp_after)
