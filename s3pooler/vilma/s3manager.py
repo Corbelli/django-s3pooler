@@ -25,10 +25,12 @@ class S3Manager():
     def __get_search_dates(self, date):
         if date is None:
             return None
+        hour_ahead = date + timedelta(hours=1)
+        day_ahead = date + timedelta(days=1)
         hour = '{}/{:02d}/{:02d}/{:02d}/'.format(date.year, date.month, date.day, date.hour)
-        next_hour = '{}/{:02d}/{:02d}/{:02d}/'.format(date.year, date.month, date.day, date.hour + 1)
+        next_hour = '{}/{:02d}/{:02d}/{:02d}/'.format(hour_ahead.year, hour_ahead.month, hour_ahead.day, hour_ahead.hour)
         day = '{}/{:02d}/{:02d}/'.format(date.year, date.month, date.day)
-        next_day = '{}/{:02d}/{:02d}/'.format(date.year, date.month, date.day + 1)
+        next_day = '{}/{:02d}/{:02d}/'.format(day_ahead.year, day_ahead.month, day_ahead.day)
         return {'hour':hour, 'next_hour':next_hour, 'day':day, 'next_day':next_day}
 
     def __get_recent_in_search(self, last_timestamp, search):
@@ -42,7 +44,7 @@ class S3Manager():
         os arquivos no bucket com eventos mais recentes que last_timestamp'''
         search = self.__get_search_dates(last_timestamp)
         recent_objs = self.__get_recent_in_search(last_timestamp, search.get('hour'))
-        if (len(recent_objs) == 0) and (datetime.utcnow().hour > last_timestamp.hour):
+        if (len(recent_objs) == 0) and time_since(last_timestamp) > timedelta(hours=1):
             recent_objs = self.__get_recent_in_search(last_timestamp, search.get('next_hour'))
             if (len(recent_objs) == 0):
                 recent_objs = self.__get_recent_in_search(last_timestamp, search.get('day'))
@@ -76,5 +78,5 @@ class S3Manager():
         jsons = [json.loads(string) for string in events_str_list]
         return jsons
 
-def now_uc(datetime):
+def time_since(datetime):
     return datetime.now().replace(tzinfo=pytz.utc) - datetime

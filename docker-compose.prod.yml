@@ -49,6 +49,11 @@ services:
     depends_on:
       - django
 
+  redis:
+    image: redis:3.2.10
+    volumes:
+      - redis-data:/data
+
   celeryflower:
     image: s3eventscrapper_django:dev
     volumes:
@@ -65,10 +70,13 @@ services:
     depends_on:
       - django
 
-  redis:
-    image: redis:3.2.10
-    volumes:
-      - redis-data:/data
+  pgadmin:
+      image: dpage/pgadmin4:latest
+      environment:
+        - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+        - PGADMIN_DEFAULT_PASSWORD=admin
+      ports:
+        - 8082:80
 
 volumes:
   django-media:
