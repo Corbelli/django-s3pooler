@@ -44,7 +44,7 @@ class S3Manager():
         os arquivos no bucket com eventos mais recentes que last_timestamp'''
         search = self.__get_search_dates(last_timestamp)
         recent_objs = self.__get_recent_in_search(last_timestamp, search.get('hour'))
-        if (len(recent_objs) == 0) and time_since(last_timestamp) > timedelta(hours=1):
+        if (len(recent_objs) == 0) and current_is_one_hour_ahead(last_timestamp):
             recent_objs = self.__get_recent_in_search(last_timestamp, search.get('next_hour'))
             if (len(recent_objs) == 0):
                 recent_objs = self.__get_recent_in_search(last_timestamp, search.get('day'))
@@ -79,4 +79,8 @@ class S3Manager():
         return jsons
 
 def time_since(datetime):
-    return datetime.now().replace(tzinfo=pytz.utc) - datetime
+    return datetime.utcnow().replace(tzinfo=pytz.utc) - datetime
+
+def current_is_one_hour_ahead(last_datetime):
+    return datetime.utcnow().replace(tzinfo=pytz.utc) > last_datetime\
+        .replace(hour=last_datetime.hour+1,minute=0,second=0)
