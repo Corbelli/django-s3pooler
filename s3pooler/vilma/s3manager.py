@@ -83,4 +83,4 @@ def time_since(datetime):
 
 def current_is_one_hour_ahead(last_datetime):
     return datetime.utcnow().replace(tzinfo=pytz.utc) > last_datetime\
-        .replace(hour=last_datetime.hour+1,minute=0,second=0)
+        .replace(minute=0,second=0) + timedelta(hours=1)
