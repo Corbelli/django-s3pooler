@@ -10,33 +10,42 @@ _local_env:
 shell: _local_env
 	docker-compose exec  django bash
 
-migrate: _local_env
-	docker-compose run --rm django python manage.py migrate --noinput
-
 mkmigrations: _local_env
 	docker-compose exec django python manage.py makemigrations
 
-start: migrate
+migrate: mkmigrations
+	docker-compose run --rm django python manage.py migrate --noinput
+
+start:
 	docker-compose up -d
 
-stopw:
-	docker-compose stop celeryworker
+start-prod:
+	docker-compose -f docker-compose.prod.yml up -d
 
-startw:
-	docker-compose start celeryworker
+stop-prod: _local_env
+	docker-compose -f docker-compose.prod.yml down -v
+
+stop-c:
+	docker-compose stop worker celerybeat
+
+start-c:
+	docker-compose start worker celerybeat
 
 worker:
 	clear
-	docker-compose logs -f --tail=1  celeryworker
+	docker-compose logs -f --tail=1  worker
+
+beat:
+	docker-compose logs celerybeat
 
 stop: _local_env
 	docker-compose down -v
 
 registered: _local_env
-	docker-compose  exec celeryworker celery inspect registered
+	docker-compose  exec worker celery inspect registered
 
 restart-celery:
-	docker-compose restart celeryworker celerybeat
+	docker-compose restart worker celerybeat
 
 build:
 	docker-compose build --force-rm --no-cache --pull

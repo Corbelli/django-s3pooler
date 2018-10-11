@@ -2,9 +2,9 @@
 
 set -e
 
-if [[ $COMMAND = "celeryworker" ]]; then
+if [[ $COMMAND = "worker" ]]; then
     echo "Running Celery Worker"
-    exec celery worker -E -A s3eventscrapper
+    exec celery worker -E -A s3eventscrapper --concurrency 1
 
 elif [[ $COMMAND = "celerybeat" ]]; then
     echo "Running Celery Beat"
@@ -17,5 +17,4 @@ elif [[ $COMMAND = "celeryflower" ]]; then
 else
     echo "Running manage.py runserver"
     exec python manage.py runserver 0:8000
-
 fi

@@ -1,29 +1,90 @@
+import pytz
+# importa utilidades para queries nas tabelas específicas de dados
+# do banco da aplicação
+from s3pooler.events.application_db import get_user
 # importa o modelo do banco de eventos
-from s3pooler.models import Events
+from s3pooler.models import RawEvents
 # importa todas as funções para criação dos dicionários de JSONField
 from s3pooler.events.contents_json import *
-# importa funções de auxilio para ler o JSON de evento no S3
-from s3pooler.utils.event_json import get_created_at, get_headers,\
-    get_request, get_response_data, get_path
-
 # Seção responsável por criar as funções específicas que sabem
 # guardar cada evento. Aconselha-se criar um função para as informacões
 # comuns a todos os eventos e uma para cada evento, exemplo :
 
-# def common(event_json):
-#     event = Events()
-#     headers = get_headers(event_json)
-#     event.referal = headers.get('Referal', 'Undefined')
-#     event.os = headers.get('OS', 'Undefined')
-#     event.device = headers.get('Device-id', 'Undefined')
-#     event.s3_key_id = event_json['s3_key_id']
-#     event.timestamp = get_created_at(event_json)
-#     return event
+def utc(naive):
+    return naive if naive == None \
+     else naive.replace(tzinfo=pytz.UTC)
 
-# def login(event_json):
-#     event = common(event_json)
-#     event.event_type = 'Login'
-#     response = get_response_data(event_json)
-#     event.user_name = response['name']
-#     event.user_id = response['id']
-#     return event
+def common(json_model, user_id):
+    event = RawEvents()
+    event.referal = json_model.headers('Referal')
+    event.os = json_model.headers('OS')
+    event.device = json_model.headers('Device-id')
+    event.timestamp = json_model.timestamp
+    event.identifier = json_model.identifier
+    event.user_id = user_id
+    user = get_user(user_id)
+    event.name = user.get('name', 'Undefined')
+    event.user_created_at = utc(user.get('created_at', None))
+    return event, user
+
+def login(json_model):
+    event, user = common(json_model, json_model.response('id', -1))
+    event.content = user_json(json_model, user)
+    return event
+
+def user_created(json_model):
+    event, user = common(json_model, json_model.response('id', -1))
+    event.content = user_json(json_model, user)
+    return event
+
+def post_reaction(json_model):
+    event, user = common(json_model, json_model.request('user_id', -1))
+    if 'post_id' in json_model.request():
+        event.target_id = json_model.request('post_id', -1)
+        event.event_type = 'Post_Reaction'
+        event.target_type = 'Post'
+    if 'comment_id' in json_model.request():
+        event.target_id = json_model.request('comment_id', -1)
+        event.event_type = 'Comment_Reaction'
+        event.target_type = 'Comment'
+    event.content = reaction_json(json_model, user)
+    return event
+
+def comment_reaction(json_model):
+    event, user = common(json_model, json_model.request('user_id', -1))
+    event.target_type = 'Comment'
+    event.target_id = json_model.request('comment_id', -1)
+    event.content = reaction_json(json_model, user)
+    return event
+
+def post_created(json_model):
+    event, user = common(json_model, json_model.response('user').get('id', -1))
+    event.event_id = json_model.response('id', -1)
+    event.content = post_json(json_model, user)
+    return event
+
+def comment_created(json_model):
+    event, user = common(json_model, json_model.request('user_id', -1))
+    event.content = comment_json(json_model, user)
+    event.target_type = 'Post'
+    event.target_id = json_model.request('post_id', -1)
+    return event
+
+def feed_scrolled(json_model):
+    event, user = common(json_model, json_model.string_params('user_id', -1))
+    event.content = scroll_json(json_model, user)
+    return event
+
+def accepted_follow(json_model):
+    event, user = common(json_model, json_model.request('user_id', -1))
+    event.target_id = json_model.request('friend_id', -1)
+    event.target_type = 'User'
+    event.content = common_json(json_model, user)
+    return event
+
+def follow_request(json_model):
+    event, user = common(json_model, json_model.request('user_id', -1))
+    event.target_id = json_model.request('following_id', -1)
+    event.target_type = 'User'
+    event.content = common_json(json_model, user)
+    return event
