@@ -35,7 +35,7 @@ class JsonEvents(models.Model):
 
     def string_params(self, param, default='Undefined'):
         return self.request_dict.get('queryStringParameters', {}).get(param, default) \
-            if param and request_dict.get('queryStringParameters') is not None \
+            if param and self.request_dict.get('queryStringParameters') is not None \
             else self.request_dict.get('queryStringParameters')
 
     timestamp = models.DateTimeField()
