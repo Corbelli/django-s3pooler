@@ -19,7 +19,7 @@ class JsonEvents(models.Model):
 
     def response(self, param=None, default='Undefined'):
         try:
-            return json.loads(self.response_dict.get('body', {}).get('data', {}).get(param, default)\
+            return json.loads(self.response_dict.get('body', {})).get('data', {}).get(param, default)\
             if param else json.loads(self.response_dict['body']).get('data', {})
         except Exception:
             return {'error': 'Could not get request body : {}'.format(self.response_dict)}
