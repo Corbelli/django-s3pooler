@@ -19,24 +19,23 @@ class JsonEvents(models.Model):
 
     def response(self, param=None, default='Undefined'):
         try:
-            return json.loads(self.response_dict['body']).get('data', {}).get(param, default)\
+            return json.loads(self.response_dict.get('body', {}).get('data', {}).get(param, default)\
             if param else json.loads(self.response_dict['body']).get('data', {})
         except Exception:
             return {'error': 'Could not get request body : {}'.format(self.response_dict)}
 
     def headers(self, param, default='Undefined'):
-        return self.request_dict['headers'].get(param, default) if param \
-            else self.request_dict['headers']
-
+        return self.request_dict.get('headers', {}).get(param, default) if param \
+            else self.request_dict.get('headers', {})
     def path(self):
-        return self.request_dict['path']
+        return self.request_dict.get('path', 'Undefined')
 
     def code(self):
-        return self.response_dict['statusCode']
+        return self.response_dict.get('statusCode', '-1')
 
     def string_params(self, param, default='Undefined'):
-        return self.request_dict['queryStringParameters'].get(param, default) \
-            if param else self.request_dict['queryStringParameters']
+        return self.request_dict.get('queryStringParameters', {}).get(param, default) \
+            if param else self.request_dict.get('queryStringParameters')
 
     timestamp = models.DateTimeField()
     request_dict = MySQLJSONField() \
