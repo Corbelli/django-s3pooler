@@ -1,6 +1,6 @@
 from django.db import transaction
 
-EVENTS_TO_POOL = 500
+EVENTS_TO_POOL = 300
 
 class Pooler():
     table = None

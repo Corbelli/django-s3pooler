@@ -9,7 +9,7 @@ from celery import shared_task
 
 
 @periodic_task(run_every=timedelta(seconds=15))
-def scrapp_s3(files_to_scrap=10):
+def scrapp_s3(files_to_scrap=5):
     scrapper = S3Scrapper()
     timestamp_before = Datetimes.objects.last_timestamp('s3pooler')
     nr_registered = scrapper.scrapp_save_update_datetime(timestamp_before, files_to_scrap)
