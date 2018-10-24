@@ -24,7 +24,7 @@ class S3Manager():
 
     def __get_search_dates(self, date):
         if date is None:
-            return None
+            return {}
         hour_ahead = date + timedelta(hours=1)
         day_ahead = date + timedelta(days=1)
         hour = '{}/{:02d}/{:02d}/{:02d}/'.format(date.year, date.month, date.day, date.hour)

@@ -15,6 +15,6 @@ elif [[ $COMMAND = "celeryflower" ]]; then
     exec celery flower -A s3eventscrapper
 
 else
-    echo "Running manage.py runserver"
-    exec python manage.py runserver 0:8000
+    echo "Running manage.py runserver --noreload"
+    exec python manage.py runserver 0:8000 --noreload
 fi

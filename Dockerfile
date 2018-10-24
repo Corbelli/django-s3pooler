@@ -19,6 +19,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . $WORKSPACE
 
-RUN python manage.py collectstatic --noinput
-
 CMD ["./cmd.sh"]

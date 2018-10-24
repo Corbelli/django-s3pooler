@@ -47,10 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
-    'raven.contrib.django.raven_compat',
     'debug_toolbar',
-    'django_celery_beat',
-    'django_celery_results',
     'rest_framework',
     'corsheaders',
     'django_filters',
@@ -236,25 +233,6 @@ SECURE_SSL_REDIRECT = not DEBUG
 ########################################################################
 # Other apps
 ########################################################################
-
-##########
-# Celery #
-##########
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_BROKER_URL = env.list('CELERY_BROKER_URL', default=None)
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_RESULT_PERSISTENT = True
-CELERY_RESULT_BACKEND = 'django-db'
-
-
-#########
-# RAVEN #
-#########
-RAVEN_CONFIG = {
-    'dsn': env.str('RAVEN_CONFIG_DSN', default=None),
-    'release': env.str('RELEASE'),
-}
-
 
 ########################
 # Django Debug Toolbar #
