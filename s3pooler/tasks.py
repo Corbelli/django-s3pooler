@@ -25,7 +25,7 @@ async def update_raw(timestamp_before=None, timestamp_after=None):
     if timestamp_after==None:
         timestamp_before = Datetimes.objects.last_timestamp('visions')
     raw_saved = raw.pool_save_update_tables(timestamp_before, timestamp_after)
-    message = '''Raw Updated, {} timestamp before: {} , after : {}'''.\
+    message = 'Raw Updated, {} timestamp before: {} , after : {}'.\
         format(raw_saved, timestamp_before, timestamp_after)
     logging.info(message)
     return (timestamp_before, timestamp_after)
@@ -33,6 +33,6 @@ async def update_raw(timestamp_before=None, timestamp_after=None):
 async def update_users(timestamp_before=None, timestamp_after=None):
     users = UsersVision()
     users_saved = users.pool_save(timestamp_before, timestamp_after)
-    message = '''Users Updated, {}  timestamp before: {} , after : {}'''.\
+    message = 'Users Updated, {}  timestamp before: {} , after : {}'.\
         format(users_saved, timestamp_before, timestamp_after)
     logging.info(message)
