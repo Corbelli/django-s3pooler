@@ -32,4 +32,14 @@ BLACKLIST = [
     18832, #Pedro de Lamare
     18835, #Paula Nabuco
     24786, #Robson Durval
+
+    19728, #Otto Blanco
+    18466, #Maria Vitoria Lago
+    20228, #Lia Conti
+    24859, #Gabriela Scramignan
+    23790, #Eduardo Cardoso
+    24843, #Desiree Pelaes
+    19762, #Carolina Tavares Rodrigues Mazzarella
+    24674, #Beijo no Estomago
+    24562, #Vitor Serrano
 ]
