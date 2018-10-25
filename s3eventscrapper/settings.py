@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_swagger',
     's3pooler.apps.S3PoolerConfig',
+    'yummie.apps.YummieConfig',
 ]
 
 

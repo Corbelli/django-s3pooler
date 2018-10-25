@@ -10,7 +10,7 @@ class S3Scrapper:
     s3 = S3Manager()
     pooler = Pooler(None)
 
-    def scrapp_save_update_datetime(self, last_timestamp, nr_files):
+    def scrapp_and_save(self, last_timestamp, nr_files):
         sorted_objs = self.s3.get_recent_objs(last_timestamp, nr_files)
         last_modified = sorted_objs[-1].last_modified if sorted_objs else None
         jsonlist = self.s3.get_keylist_jsons([obj.key for obj in sorted_objs])

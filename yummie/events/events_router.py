@@ -1,8 +1,9 @@
 # importa todas as callbacks definidas
-from s3pooler.events.events import *
+from yummie.events.events import *
 from s3pooler.vilma.router import Router
 # local responsável por criar o dicionário de associação entre cada rota
 # e a callback correspondente que deva tratá-la. Exemplo:
+
 router = Router()
 router.register('/api/user/login', login, 'Login')
 router.register('/api/user/register', user_created, 'User_Created')

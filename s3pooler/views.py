@@ -3,6 +3,7 @@ from datetime import datetime
 from .models import EventPaths, Datetimes
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .apps import  S3PoolerConfig
 import logging
 
 @api_view(['POST'])
@@ -11,6 +12,7 @@ def set_s3pooler_datetime(request):
 
 @api_view(['POST'])
 def set_visions_datetime(request):
+    S3PoolerConfig.views_update = True
     return set_datetime(request, 'visions')
 
 @api_view(['DELETE'])

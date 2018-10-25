@@ -1,11 +1,11 @@
 import pytz
 # importa utilidades para queries nas tabelas específicas de dados
 # do banco da aplicação
-from s3pooler.events.application_db import get_user
+from yummie.events.application_db import get_user
 # importa o modelo do banco de eventos
-from s3pooler.models import RawEvents
+from yummie.models import RawEvents
 # importa todas as funções para criação dos dicionários de JSONField
-from s3pooler.events.contents_json import *
+from yummie.events.contents_json import *
 # Seção responsável por criar as funções específicas que sabem
 # guardar cada evento. Aconselha-se criar um função para as informacões
 # comuns a todos os eventos e uma para cada evento, exemplo :
