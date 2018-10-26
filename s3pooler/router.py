@@ -1,9 +1,8 @@
 from functools import reduce
 
-
-routes = {}
-
 class Router():
+    
+    routes = {}
 
     def register(self, url, callback=None, event=None):
         path_dict = {}
@@ -13,7 +12,7 @@ class Router():
         path_dict['params'] = [field[1:-1] for field in fields if self.__isparam(field)]
         path_dict['not_params'] = [field for field in fields if not self.__isparam(field)]
         path_dict['pure_path'] = reduce((lambda x, y: x + '/' + y), path_dict['not_params'], '')
-        routes[url] = path_dict
+        Router.routes[url] = path_dict
 
     def get(self, url):
         return self.__add_params_dict(self.__find_first_match(url), url)
@@ -27,7 +26,7 @@ class Router():
 
     def __find_first_match(self, url):
         fields = [field for field in url.split('/') if field]
-        for url_dict in routes.values():
+        for url_dict in Router.routes.values():
             if set(url_dict['not_params']).difference(set(fields)) == set():
                 return url_dict
         return {}

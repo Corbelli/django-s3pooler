@@ -1,6 +1,6 @@
 from django.db import transaction
 from s3pooler.models import Datetimes
-from s3pooler.vilma.processors import EventsJSONProcessor, PathsProcessor
+from s3pooler.processors import EventsJSONProcessor, PathsProcessor
 EVENTS_TO_POOL = 300
 
 class Pooler():

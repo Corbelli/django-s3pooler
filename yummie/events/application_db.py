@@ -1,4 +1,4 @@
-from s3pooler.utils.querytool import QueryTool
+from s3pooler.querytool import QueryTool
 
 users = QueryTool('app_db','users')
 

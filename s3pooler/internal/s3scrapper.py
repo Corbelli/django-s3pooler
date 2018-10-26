@@ -1,5 +1,5 @@
 import pytz
-from .pooler import Pooler
+from s3pooler.pooler import Pooler
 from datetime import datetime
 from .s3manager import S3Manager
 from django.db import transaction

@@ -1,8 +1,8 @@
 from .constants import BLACKLIST
 from s3pooler.models import JsonEvents
-from s3pooler.vilma.pooler import Pooler
+from s3pooler.pooler import Pooler
 from .models import RawEvents, UsersEvents
-from s3pooler.vilma.processors import EventsProcessor, EventsJSONProcessor, PathsProcessor
+from s3pooler.processors import EventsProcessor, EventsJSONProcessor, PathsProcessor
 
 class UsersVision():
     pooler = Pooler(RawEvents)

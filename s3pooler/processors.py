@@ -1,4 +1,4 @@
-from s3pooler.vilma.router import Router
+from s3pooler.router import Router
 from s3pooler.models import EventPaths
 
 router = Router()

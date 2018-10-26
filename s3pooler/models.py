@@ -1,5 +1,7 @@
 import json
+import pytz
 from django.db import models
+from datetime import datetime, timedelta
 from django_mysql.models import  Model
 from django.contrib.postgres.fields import JSONField as PostgresJSONField
 from django_mysql.models import JSONField as MySQLJSONField
@@ -9,7 +11,15 @@ env = environ.Env()
 ### Específico para MySQL ###
 is_mysql = (env.str('EV_DB_ENGINE', '').split('.')[-1] == 'mysql')
 
+class JsonEventsManager(models.Manager):
+    def purge(self):
+        one_day_ago = datetime.utcnow().replace(tzinfo=pytz.utc) -  timedelta(days=1)
+        return self.filter(inserted_at__lt=one_day_ago).delete()
+
 class JsonEvents(models.Model):
+
+    objects = JsonEventsManager()
+
     def request(self, param=None, default='Undefined'):
         try:
             return json.loads(self.request_dict['body']).get(param, default)\
@@ -38,16 +48,16 @@ class JsonEvents(models.Model):
             if param and self.request_dict.get('queryStringParameters') is not None \
             else default
 
+
     timestamp = models.DateTimeField()
     request_dict = MySQLJSONField() \
         if is_mysql else PostgresJSONField()
     response_dict = MySQLJSONField() \
         if is_mysql else PostgresJSONField()
-    inserted_at = models.DateTimeField(auto_now_add=True)
+    inserted_at = models.DateTimeField(default=datetime.utcnow().replace(tzinfo=pytz.utc))
     identifier = models.CharField(max_length=100)
     class Meta:
             indexes = [models.Index(fields=['timestamp'])]
-
 
 class DatetimeManager(models.Manager):
     def last_timestamp(self, associated_table):

@@ -1,15 +1,11 @@
-import sys
-import logging
 from django.apps import AppConfig
 
 class YummieConfig(AppConfig):
     name = 'yummie'
 
     def ready(self):
-        from s3pooler.apps import Loader
+        import yummie.events.events_router 
+        from s3pooler.loader import Loader
         from .visions import RawVision, UsersVision
-        from .events.events_router import router
-        if 'runserver' in sys.argv:
-            pooler = Loader()
-            pooler.load_tasks(RawVision(), [UsersVision()])
-            pooler.start() 
+        visions_in_order = [RawVision, UsersVision]
+        Loader().start_pooler(visions_in_order)
