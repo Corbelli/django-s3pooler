@@ -42,4 +42,5 @@ BLACKLIST = [
     19762, #Carolina Tavares Rodrigues Mazzarella
     24674, #Beijo no Estomago
     24562, #Vitor Serrano
+
 ]
