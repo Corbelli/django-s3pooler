@@ -1,9 +1,11 @@
 from django.db import transaction
-
+from s3pooler.models import Datetimes
+from s3pooler.processors import EventsJSONProcessor, PathsProcessor
 EVENTS_TO_POOL = 300
 
 class Pooler():
     table = None
+    paths_saver = PathsProcessor()
 
     def __init__(self, table):
         self.table = table
@@ -12,6 +14,14 @@ class Pooler():
                 min_timestamp=None, max_timestamp=None):
         filtered = filter_func(self.__get_in_timestamp(min_timestamp, max_timestamp))
         return list(filtered[:EVENTS_TO_POOL])
+
+    @transaction.atomic
+    def save_models_main_vision(self, modellist, translated_modellist, max_timestamp, table_to_save):
+        self.paths_saver.update_save_paths(modellist)
+        last_timestamp = self.__get_max_timestamp(translated_modellist)
+        if max_timestamp==None and last_timestamp != None:
+                Datetimes.objects.set_last_datetime('visions', last_timestamp)
+        return self.save_models(translated_modellist,table_to_save)
 
     @transaction.atomic
     def save_models(self, models, table_to_save):
@@ -33,3 +43,7 @@ class Pooler():
             return self.table.objects.filter(timestamp__gte=min_timestamp)
         else:
             return self.table.objects.all()
+
+    def __get_max_timestamp(self, models):
+        return sorted(models, key=lambda model: model.timestamp)[-1].timestamp \
+            if len(models) != 0 else None

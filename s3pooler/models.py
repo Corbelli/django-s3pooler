@@ -1,5 +1,7 @@
 import json
+import pytz
 from django.db import models
+from datetime import datetime, timedelta
 from django_mysql.models import  Model
 from django.contrib.postgres.fields import JSONField as PostgresJSONField
 from django_mysql.models import JSONField as MySQLJSONField
@@ -9,7 +11,15 @@ env = environ.Env()
 ### Específico para MySQL ###
 is_mysql = (env.str('EV_DB_ENGINE', '').split('.')[-1] == 'mysql')
 
+class JsonEventsManager(models.Manager):
+    def purge(self):
+        one_day_ago = datetime.utcnow().replace(tzinfo=pytz.utc) -  timedelta(days=1)
+        return self.filter(inserted_at__lt=one_day_ago).delete()
+
 class JsonEvents(models.Model):
+
+    objects = JsonEventsManager()
+
     def request(self, param=None, default='Undefined'):
         try:
             return json.loads(self.request_dict['body']).get(param, default)\
@@ -38,42 +48,16 @@ class JsonEvents(models.Model):
             if param and self.request_dict.get('queryStringParameters') is not None \
             else default
 
+
     timestamp = models.DateTimeField()
     request_dict = MySQLJSONField() \
         if is_mysql else PostgresJSONField()
     response_dict = MySQLJSONField() \
         if is_mysql else PostgresJSONField()
-    inserted_at = models.DateTimeField(auto_now_add=True)
+    inserted_at = models.DateTimeField(default=datetime.utcnow().replace(tzinfo=pytz.utc))
     identifier = models.CharField(max_length=100)
     class Meta:
             indexes = [models.Index(fields=['timestamp'])]
-
-class Events(Model if is_mysql else models.Model):
-    timestamp = models.DateTimeField()
-    name = models.CharField(max_length=200)
-    event_type = models.CharField(max_length=25)
-    event_id = models.BigIntegerField(null=True)
-    user_id = models.BigIntegerField()
-    user_created_at = models.DateTimeField(null=True)
-    content = MySQLJSONField(null=True) \
-        if is_mysql else PostgresJSONField(null=True)
-    target_type = models.CharField(max_length=20, null=True)
-    target_id = models.BigIntegerField(null=True)
-    referal = models.CharField(max_length=20, default='Undefined')
-    os = models.CharField(max_length=20, default='Undefined')
-    device = models.CharField(max_length=50, default='Undefined')
-    identifier = models.CharField(max_length=100)
-    class Meta:
-        abstract = True
-        indexes = [
-           models.Index(fields=['-timestamp','event_type']),
-           models.Index(fields=['event_type']),
-        ]
-
-class RawEvents(Events):
-    pk_id = models.AutoField(primary_key=True)
-class UsersEvents(Events):
-    pk_id = models.AutoField(primary_key=True)
 
 class DatetimeManager(models.Manager):
     def last_timestamp(self, associated_table):

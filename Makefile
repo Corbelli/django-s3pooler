@@ -25,27 +25,21 @@ start-prod:
 stop-prod: _local_env
 	docker-compose -f docker-compose.prod.yml down -v
 
-stop-c:
-	docker-compose stop worker celerybeat
+stop-d:
+	docker-compose stop django
 
-start-c:
-	docker-compose start worker celerybeat
+start-d:
+	docker-compose start django
 
-worker:
+django:
 	clear
-	docker-compose logs -f --tail=1  worker
-
-beat:
-	docker-compose logs celerybeat
+	docker-compose logs -f --tail=1  django
 
 stop: _local_env
-	docker-compose down -v
+	docker-compose down 
 
-registered: _local_env
-	docker-compose  exec worker celery inspect registered
-
-restart-celery:
-	docker-compose restart worker celerybeat
+restart:
+	docker-compose restart django
 
 build:
 	docker-compose build --force-rm --no-cache --pull

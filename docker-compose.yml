@@ -20,61 +20,11 @@ services:
       - 8000:8000
     depends_on:
       - postgres
-      - redis
-
-  worker:
-    image: s3eventscrapper_django:dev
-    volumes:
-      - ./:/usr/src/app
-      - django-media:/usr/src/app/media
-      - django-static:/usr/src/app/static
-    env_file:
-      - develop.env
-      - local.env
-    environment:
-      - COMMAND=worker
-    depends_on:
-      - django
-
-  celerybeat:
-    image: s3eventscrapper_django:dev
-    volumes:
-      - ./:/usr/src/app
-      - django-media:/usr/src/app/media
-      - django-static:/usr/src/app/static
-    env_file:
-      - develop.env
-      - local.env
-    environment:
-      - COMMAND=celerybeat
-    depends_on:
-      - django
-
-  celeryflower:
-    image: s3eventscrapper_django:dev
-    volumes:
-      - ./:/usr/src/app
-      - django-media:/usr/src/app/media
-      - django-static:/usr/src/app/static
-    env_file:
-      - develop.env
-      - local.env
-    environment:
-      - COMMAND=celeryflower
-    ports:
-      - 5555:5555
-    depends_on:
-      - django
 
   postgres:
     image: postgres:10.1
     volumes:
       - postgres-data:/var/lib/postgresql/data
-
-  redis:
-    image: redis:3.2.10
-    volumes:
-      - redis-data:/data
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -86,20 +36,10 @@ services:
     depends_on:
       - postgres
 
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    environment:
-      - REDIS_HOSTS=default:redis:6379:0,sessions:redis:6379:1,broker:redis:6379:2
-    ports:
-      - 8081:8081
-    depends_on:
-      - redis
-
 volumes:
   django-media:
   django-static:
   postgres-data:
-  redis-data:
 
 networks:
   default:

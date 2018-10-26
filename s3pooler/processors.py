@@ -1,5 +1,7 @@
-from s3pooler.events.events_router import router
-from s3pooler.models import EventPaths, UsersEvents
+from s3pooler.router import Router
+from s3pooler.models import EventPaths
+
+router = Router()
 
 class EventsJSONProcessor:
     def translate_modellist(self, s3_json_models):
