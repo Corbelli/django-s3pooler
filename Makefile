@@ -4,44 +4,23 @@
 
 default:
 
-_local_env:
-	-cp -n local.env.sample local.env
 
-shell: _local_env
-	docker-compose exec  django bash
+shell: 
+	docker-compose exec  packageloader bash
 
-mkmigrations: _local_env
-	docker-compose exec django python manage.py makemigrations
-
-migrate: mkmigrations
-	docker-compose run --rm django python manage.py migrate --noinput
+build-package:
+	docker-compose run --rm packageloader python setup.py sdist
 
 start:
 	docker-compose up -d
 
-start-prod:
-	docker-compose -f docker-compose.prod.yml up -d
-
-stop-prod: _local_env
-	docker-compose -f docker-compose.prod.yml down -v
-
-stop-d:
-	docker-compose stop django
-
-start-d:
-	docker-compose start django
-
-django:
-	clear
-	docker-compose logs -f --tail=1  django
-
-stop: _local_env
+stop: 
 	docker-compose down 
 
 restart:
-	docker-compose restart django
+	docker-compose restart 
 
-build:
+build-image:
 	docker-compose build --force-rm --no-cache --pull
 
 logs:
