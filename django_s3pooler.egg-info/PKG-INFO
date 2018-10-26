@@ -1,0 +1,42 @@
+Metadata-Version: 1.1
+Name: django-s3pooler
+Version: 0.1
+Summary: A Django-App to Automate S3 json events files scrapping.
+Home-page: https://www.finxi.com.br/
+Author: Rodrigo Corbelli
+Author-email: rodrigo.corbelli@finxi.com.br
+License: BSD License
+Description: # Django-S3Poller
+        
+        
+        Detailed documentation is in the "docs" directory.
+        
+        Quick start
+        -----------
+        
+        1. Add "s3pooler" to your INSTALLED_APPS BEFORE YOUR APPS setting like this::
+        
+            INSTALLED_APPS = [
+                ...
+                's3pooler',
+            ]
+        
+        2. Include the polls URLconf in your project urls.py like this::
+        
+            path('s3pooler/', include('polls.urls')),
+        
+        3. Run `python manage.py migrate` to create the models.
+        
+        
+Platform: UNKNOWN
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 1.11
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
