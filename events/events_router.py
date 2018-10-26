@@ -1,5 +1,5 @@
 # importa todas as callbacks definidas
-from yummie.events.events import *
+from .events import *
 from s3pooler.router import Router
 # local responsável por criar o dicionário de associação entre cada rota
 # e a callback correspondente que deva tratá-la. Exemplo:
