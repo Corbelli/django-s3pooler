@@ -1,10 +1,5 @@
 FROM python:3.6.4-stretch
 
-MAINTAINER Django <django@macetado.com>
-
-ARG release=undefined
-ENV RELEASE=$release
-
 ENV DJANGO_COLORS="dark"
 
 # Creating workspace
@@ -19,6 +14,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY . $WORKSPACE
 
-RUN python manage.py collectstatic --noinput
-
-CMD ["./cmd.sh"]

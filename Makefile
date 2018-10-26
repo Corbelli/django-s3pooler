@@ -4,50 +4,23 @@
 
 default:
 
-_local_env:
-	-cp -n local.env.sample local.env
 
-shell: _local_env
-	docker-compose exec  django bash
+shell: 
+	docker-compose exec  packageloader bash
 
-mkmigrations: _local_env
-	docker-compose exec django python manage.py makemigrations
-
-migrate: mkmigrations
-	docker-compose run --rm django python manage.py migrate --noinput
+build-package:
+	docker-compose run --rm packageloader python setup.py sdist
 
 start:
 	docker-compose up -d
 
-start-prod:
-	docker-compose -f docker-compose.prod.yml up -d
+stop: 
+	docker-compose down 
 
-stop-prod: _local_env
-	docker-compose -f docker-compose.prod.yml down -v
+restart:
+	docker-compose restart 
 
-stop-c:
-	docker-compose stop worker celerybeat
-
-start-c:
-	docker-compose start worker celerybeat
-
-worker:
-	clear
-	docker-compose logs -f --tail=1  worker
-
-beat:
-	docker-compose logs celerybeat
-
-stop: _local_env
-	docker-compose down -v
-
-registered: _local_env
-	docker-compose  exec worker celery inspect registered
-
-restart-celery:
-	docker-compose restart worker celerybeat
-
-build:
+build-image:
 	docker-compose build --force-rm --no-cache --pull
 
 logs:
