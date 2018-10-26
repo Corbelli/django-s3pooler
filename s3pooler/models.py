@@ -16,6 +16,9 @@ class JsonEventsManager(models.Manager):
         one_day_ago = datetime.utcnow().replace(tzinfo=pytz.utc) -  timedelta(days=1)
         return self.filter(inserted_at__lt=one_day_ago).delete()
 
+def utc_now():
+    return datetime.utcnow().replace(tzinfo=pytz.utc)
+
 class JsonEvents(models.Model):
 
     objects = JsonEventsManager()
@@ -54,7 +57,7 @@ class JsonEvents(models.Model):
         if is_mysql else PostgresJSONField()
     response_dict = MySQLJSONField() \
         if is_mysql else PostgresJSONField()
-    inserted_at = models.DateTimeField(default=datetime.utcnow().replace(tzinfo=pytz.utc))
+    inserted_at = models.DateTimeField(default=utc_now)
     identifier = models.CharField(max_length=100)
     class Meta:
             indexes = [models.Index(fields=['timestamp'])]

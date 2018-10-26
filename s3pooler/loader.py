@@ -16,10 +16,11 @@ class Loader():
     def start_pooler(self,  visions):
         from .internal.updaters import update_json, main_factory, vision_factory, purge_jsonevents_table
         self.scrapp = update_json
-        self.main = main_factory(visions[0])
-        self.visions = [vision_factory(vision) for vision in visions[1:]] 
-        self.purge = purge_jsonevents_table
-        self.start()
+        if len(visions) != 0:
+            self.main = main_factory(visions[0])
+            self.visions = [vision_factory(vision) for vision in visions[1:]] 
+            self.purge = purge_jsonevents_table
+            self.start()
 
     def start(self):
         if 'runserver' in sys.argv:

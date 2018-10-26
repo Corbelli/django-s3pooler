@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from s3pooler.internal.s3scrapper import S3Scrapper
 from django.db import transaction
 from s3pooler.models import Datetimes, JsonEvents
@@ -6,9 +7,8 @@ from s3pooler.processors import EventsJSONProcessor, PathsProcessor
 from s3pooler.pooler import Pooler
 
 
-scrapper = S3Scrapper()
-
 async def update_json(files_to_scrap=5):
+    scrapper = S3Scrapper()
     timestamp_before = Datetimes.objects.last_timestamp('s3pooler')
     nr_registered = scrapper.scrapp_and_save(timestamp_before, files_to_scrap)
     timestamp_after = Datetimes.objects.last_timestamp('s3pooler')
@@ -22,6 +22,7 @@ def main_factory(VisionClass):
         if timestamp_after==None:
             timestamp_before = Datetimes.objects.last_timestamp('visions')
         vision = VisionClass()
+        vision.timestamp_after = timestamp_after
         events_saved = vision.pool(timestamp_before, timestamp_after)
         message = 'Vision {} Updated, {}  new, timestamp before: {} , after : {}'.\
             format(vision_id, events_saved, timestamp_before, timestamp_after)
