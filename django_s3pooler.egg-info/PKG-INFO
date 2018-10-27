@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: django-s3pooler
-Version: 0.1
+Version: 0.2
 Summary: A Django-App to Automate S3 json events files scrapping.
 Home-page: https://www.finxi.com.br/
 Author: Rodrigo Corbelli
