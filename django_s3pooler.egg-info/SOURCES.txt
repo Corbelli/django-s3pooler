@@ -21,6 +21,9 @@ s3pooler/internal/__init__.py
 s3pooler/internal/s3manager.py
 s3pooler/internal/s3scrapper.py
 s3pooler/internal/updaters.py
+s3pooler/management/__init__.py
+s3pooler/management/commands/__init__.py
+s3pooler/management/commands/starts3app.py
 s3pooler/migrations/0001_initial.py
 s3pooler/migrations/0002_auto_20181025_1958.py
 s3pooler/migrations/0003_auto_20181026_1845.py
